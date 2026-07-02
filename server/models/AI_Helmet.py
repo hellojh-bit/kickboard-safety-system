@@ -3,7 +3,7 @@ import os
 
 # 1. 모델 로드
 # 우분투 노트북 Flask_Server 폴더 안에 best.pt
-model_path = os.path.join(os.path.dirname(__file__), 'best.pt')
+model_path = os.path.join(os.path.dirname(__file__), 'models','best.pt')
 model = YOLO(model_path)
 
 def predict_helmet(image_path):
