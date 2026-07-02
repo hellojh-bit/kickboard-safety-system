@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전동 킥보드 안전 관제 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="border-b border-gray-700 pb-4 mb-8 flex justify-between items-center">
+            <h1 class="text-3xl font-bold tracking-wider text-green-400">🛴 실시간 하중 관제 대시보드</h1>
+            <div id="status-badge" class="px-4 py-2 rounded-full font-bold bg-gray-700 text-gray-300">
+                서버 대기 중...
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-xl font-semibold mb-4 text-gray-300">📈 실시간 총 하중 변화 (Total Weight)</h2>
+                <div class="relative h-80">
+                    <canvas id="weightChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-xl font-semibold mb-2 text-gray-300">🦶 개별 센서 하중 (히트맵)</h2>
+                <p class="text-xs text-gray-400 mb-6">* 색상이 붉을수록 높은 하중을 의미합니다.</p>
+                
+                <div class="grid grid-cols-2 gap-4 max-w-xs mx-auto bg-gray-950 p-6 rounded-3xl border-4 border-gray-600">
+                    <div id="cell-w1" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH1</span><span id="val-w1" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w2" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH2</span><span id="val-w2" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w3" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH3</span><span id="val-w3" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w4" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH4</span><span id="val-w4" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w5" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH5</span><span id="val-w5" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w6" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH6</span><span id="val-w6" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w7" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH7</span><span id="val-w7" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                    <div id="cell-w8" class="bg-gray-800 border border-gray-700 p-4 rounded-xl text-center transition-all duration-300"><span class="block text-xs text-gray-400">CH8</span><span id="val-w8" class="text-lg font-bold">0.0</span><span class="text-xs"> kg</span></div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-700 text-center bg-gray-900 p-3 rounded-lg">
+                    <span class="text-sm text-gray-400 block">현재 총 무게</span>
+                    <span id="total-weight-text" class="text-3xl font-bold text-yellow-400">0.0</span> <span class="text-gray-400">kg</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Chart.js 라인 차트 설정
+        const ctx = document.getElementById('weightChart').getContext('2d');
+        const weightChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // 시간 데이터
+                datasets: [{
+                    label: '총 하중 (kg)',
+                    data: [], // 무게 데이터
+                    borderColor: '#34D399',
+                    backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3 // 선을 부드럽게
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#374151' }, ticks: { color: '#9CA3AF' } },
+                    y: { grid: { color: '#374151' }, ticks: { color: '#9CA3AF' }, suggestedMin: 0, suggestedMax: 100 }
+                },
+                plugins: { legend: { labels: { color: '#FFF' } } }
+            }
+        });
+
+        // 2. 무게에 따라 발판 칸의 색상을 변경하는 함수 (히트맵 효과)
+        function getCellBgColor(weight) {
+            if (weight < 2.0) return 'bg-gray-800 text-white'; // 빈 상태
+            if (weight < 15.0) return 'bg-green-700 text-white font-semibold'; // 가벼운 하중
+            if (weight < 40.0) return 'bg-yellow-600 text-white font-bold'; // 중간 하중
+            return 'bg-red-600 text-white font-bold animate-pulse'; // 무거운 하중 (위험 알림)
+        }
+
+        // 3. 서버에서 데이터를 가져와서 화면을 업데이트하는 함수
+        async function fetchRealtimeWeight() {
+            try {
+                const response = await fetch('/api/realtime-weight');
+                const json = await response.json();
+                
+                if (json.result === "SUCCESS" && json.data) {
+                    const d = json.data;
+
+                    // 화면 텍스트 업데이트
+                    document.getElementById('total-weight-text').innerText = d.total_weight.toFixed(1);
+
+                    // 8개 센서 값 및 배경색 업데이트
+                    for(let i = 1; i <= 8; i++) {
+                        const weightVal = d[`w${i}`] || 0;
+                        document.getElementById(`val-w${i}`).innerText = weightVal.toFixed(1);
+                        
+                        const cell = document.getElementById(`cell-w${i}`);
+                        cell.className = `border border-gray-700 p-4 rounded-xl text-center transition-all duration-300 ${getCellBgColor(weightVal)}`;
+                    }
+
+                    // 상단 상태 배지 업데이트 (다인 탑승 감지 시 경고)
+                    const badge = document.getElementById('status-badge');
+                    if (d.is_multiple_riders === 1) {
+                        badge.innerText = "🚨 다인 탑승 감지됨: 주행 차단!";
+                        badge.className = "px-4 py-2 rounded-full font-bold bg-red-600 text-white animate-pulse";
+                    } else {
+                        badge.innerText = "🟢 정상 탑승 상태";
+                        badge.className = "px-4 py-2 rounded-full font-bold bg-green-600 text-white";
+                    }
+
+                    // 그래프 데이터 업데이트 (최근 20개 데이터만 유지)
+                    const timeStr = d.timestamp.split(' ')[1] || d.timestamp; 
+                    if (weightChart.data.labels.length > 20) {
+                        weightChart.data.labels.shift();
+                        weightChart.data.datasets[0].data.shift();
+                    }
+                    weightChart.data.labels.push(timeStr);
+                    weightChart.data.datasets[0].data.push(d.total_weight);
+                    weightChart.update();
+                }
+            } catch (error) {
+                console.error('데이터 갱신 대기 중...');
+            }
+        }
+
+        // 4. 1초(1000ms)마다 함수 반복 실행
+        setInterval(fetchRealtimeWeight, 1000);
+    </script>
+</body>
+</html>
