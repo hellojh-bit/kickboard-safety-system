@@ -62,16 +62,17 @@
 
 ## 4. 파일 구성
 
-| 경로                                | 파일명                         | 설명                                                                   |
-| --------------------------------- | --------------------------- | -------------------------------------------------------------------- |
-| `server/app.py`                   | `app.py`                    | Flask 서버 메인 파일입니다. 회원가입, 로그인, 헬멧 인증, 라즈베리파이 상태 수신, 대시보드 API를 처리합니다.  |
-| `server/DB.py`                    | `DB.py`                     | SQLite 데이터베이스 생성 및 로그 저장을 담당합니다. 사용자 정보, 헬멧 인증 로그, 로드셀 하중 로그를 관리합니다. |
-| `server/AI_Helmet.py`             | `AI_Helmet.py`              | YOLO 모델을 이용하여 이미지에서 헬멧 착용 여부를 판별합니다.                                 |
-| `server/templates/dashboard.html` | `dashboard.html`            | 실시간 하중 데이터와 다인 탑승 여부를 보여주는 웹 대시보드 화면입니다.                             |
-| `raspberry-pi/rpi_algorithm.py`   | `rpi_algorithm.py`          | 라즈베리파이에서 실행되는 하드웨어 제어 코드입니다. 로드셀, 모터, LED, 스위치, 경고음, 서버 통신을 담당합니다.   |
-| `docs/paper.hwp`                  | `paper.hwp`                 | 개인형 이동장치 통합 안전 제어 시스템 논문 파일입니다.                                      |
-| `docs/capstone_final_report.hwp`  | `capstone_final_report.hwp` | 캡스톤 디자인 최종보고서 또는 발표자료입니다. 코드 분석 대상이 아닌 참고 문서입니다.                     |
-| `analysis/code-analysis.md`       | `code-analysis.md`          | 코드 파일 5개의 역할과 기능을 정리한 분석 문서입니다.                                      |
+| 경로 | 파일명 | 설명 |
+|---|---|---|
+| `server/app.py` | `app.py` | Flask 서버 메인 파일입니다. 회원가입, 로그인, 헬멧 인증, 라즈베리파이 상태 수신, 대시보드 API를 처리합니다. |
+| `server/DB.py` | `DB.py` | SQLite 데이터베이스 생성 및 로그 저장을 담당합니다. 사용자 정보, 헬멧 인증 로그, 로드셀 하중 로그를 관리합니다. |
+| `server/AI_Helmet.py` | `AI_Helmet.py` | YOLO 모델을 이용하여 이미지에서 헬멧 착용 여부를 판별합니다. |
+| `server/models/best.pt` | `best.pt` | 헬멧 착용 여부를 판별하는 YOLO 학습 모델 파일입니다. |
+| `server/templates/dashboard.html` | `dashboard.html` | 실시간 하중 데이터와 다인 탑승 여부를 보여주는 웹 대시보드 화면입니다. |
+| `raspberry-pi/rpi_algorithm.py` | `rpi_algorithm.py` | 라즈베리파이에서 실행되는 하드웨어 제어 코드입니다. 로드셀, 모터, LED, 스위치, 경고음, 서버 통신을 담당합니다. |
+| `docs/paper.hwp` | `paper.hwp` | 개인형 이동장치 통합 안전 제어 시스템 논문 파일입니다. |
+| `docs/capstone_final_report.hwp` | `capstone_final_report.hwp` | 캡스톤 디자인 최종보고서 또는 발표자료입니다. 코드 분석 대상이 아닌 참고 문서입니다. |
+| `analysis/code-analysis.md` | `code-analysis.md` | 코드 파일 5개의 역할과 기능을 정리한 분석 문서입니다. |
 
 ## 5. 폴더 구조
 
@@ -84,12 +85,10 @@ kickboard-safety-system/
 │   ├── app.py
 │   ├── DB.py
 │   ├── AI_Helmet.py
-│   ├── templates/
-│   │   └── dashboard.html
-│   ├── uploads/
-│   │   └── .gitkeep
-│   └── models/
-│       └── best.pt
+│   ├── models/
+│   │   └── best.pt
+│   └── templates/
+│       └── dashboard.html
 ├── raspberry-pi/
 │   └── rpi_algorithm.py
 ├── docs/
@@ -99,7 +98,6 @@ kickboard-safety-system/
 │   └── code-analysis.md
 └── assets/
     └── images/
-```
 
 ## 6. 실행 방법
 
@@ -246,19 +244,17 @@ YOLO 기반 헬멧 판별 파일입니다.
 
 ## 9. 사용 기술
 
-본 프로젝트에서 사용한 주요 기술은 다음과 같습니다.
-
-| 구분      | 기술                                       |
-| ------- | ---------------------------------------- |
-| 서버      | Python, Flask, Flask-CORS                |
-| 데이터베이스  | SQLite                                   |
-| AI 모델   | YOLO, Ultralytics                        |
-| 하드웨어 제어 | Raspberry Pi 5, GPIO, lgpio              |
-| 센서      | Load Cell, HX710A, HX711                 |
-| 모터 제어   | DDSM115, USB-RS485, Serial 통신            |
-| 웹 대시보드  | HTML, Tailwind CSS, Chart.js, JavaScript |
-| 통신      | HTTP, REST API, JSON                     |
-| 모바일 연동  | Android App, QR 인증, 이미지 업로드              |
+| 구분 | 기술 |
+|---|---|
+| 서버 | Python, Flask, Flask-CORS |
+| 데이터베이스 | SQLite |
+| AI 모델 | YOLO, Ultralytics |
+| 하드웨어 제어 | Raspberry Pi 5, GPIO, lgpio |
+| 센서 | Load Cell, HX710A, HX711 |
+| 모터 제어 | DDSM115, USB-RS485, Serial 통신 |
+| 웹 대시보드 | HTML, Tailwind CSS, Chart.js, JavaScript |
+| 통신 | HTTP, REST API, JSON |
+| 모바일 연동 | Android App, QR 인증, 이미지 업로드 |
 
 ## 10. 참고 사항
 
@@ -281,3 +277,10 @@ YOLO 기반 헬멧 판별 파일입니다.
 * 라즈베리파이 하드웨어 연결 안정화
 * 다양한 사용자와 환경에서 다인 탑승 판별 정확도 개선
 * 야간, 우천, 역광 환경에서 헬멧 인식 성능 개선
+
+### 4) YOLO 모델 파일 위치
+
+헬멧 판별 모델 파일은 다음 위치에 있어야 합니다.
+
+```text
+server/models/best.pt
